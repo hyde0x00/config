@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+
+type=jpg
+
+to_jpg() {
+  magick "$1" -quality 95 -strip "${1%.*}_converted.jpg"
+}
+
+to_jpg_small() {
+  magick "$1" -resize 1080x\> -quality 95 -strip "${1%.*}_converted_small.jpg"
+}
+
+to_png() {
+  magick "$1" -strip -define png:compression-filter=5 \
+    -define png:compression-level=9 \
+    -define png:compression-strategy=1 \
+    -define png:exclude-chunk=all \
+    "${1%.*}_converted.png"
+}
+
+_convert() {
+  case "$type" in
+    jpg) to_jpg "$1" ;;
+    jpg_small) to_jpg_small "$1" ;;
+    png) to_png "$1" ;;
+  esac
+}
+
+while getopts ":sp" opt; do
+  case "$opt" in
+    s) type="jpg_small" ;;
+    p) type="png" ;;
+    *) exit 1 ;;
+  esac
+done
+
+shift $((OPTIND-1))
+
+for img in "$@"; do _convert "$img"; done

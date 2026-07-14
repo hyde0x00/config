@@ -1,0 +1,126 @@
+diff --git a/libr/core/agraph.c b/libr/core/agraph.c
+index d2f32d37d0..781422f68e 100644
+--- a/libr/core/agraph.c
++++ b/libr/core/agraph.c
+@@ -4863,11 +4863,6 @@ R_API bool r_core_visual_graph(RCore *core, RAGraph *g, RAnalFunction *_fcn, int
+ 			}
+ 			break;
+ 		case 'R':
+-			if (r_config_get_b (core->config, "scr.randpal")) {
+-				r_core_cmd_call (core, "ecr");
+-			} else {
+-				r_core_cmd_call (core, "ecn");
+-			}
+ 			g->edgemode = r_config_get_i (core->config, "graph.edges");
+ 			fcn = r_anal_get_fcn_in (core->anal, core->addr, 0);
+ 			if (fcn) {
+diff --git a/libr/core/panels.c b/libr/core/panels.c
+index 5265dfef7b..8f679480d1 100644
+--- a/libr/core/panels.c
++++ b/libr/core/panels.c
+@@ -7006,17 +7006,6 @@ virtualmouse:
+ 	case 'c':
+ 		__activate_cursor (core);
+ 		break;
+-	case 'C':
+-		{
+-			int color = r_config_get_i (core->config, "scr.color");
+-			if (++color > 2) {
+-				color = 0;
+-			}
+-			r_config_set_i (core->config, "scr.color", color);
+-			can->color = color;
+-			__set_refresh_all (core, true, false);
+-		}
+-		break;
+ 	case 'r':
+ 		if (r_config_get_i (core->config, "asm.hint.call")) {
+ 			r_config_toggle (core->config, "asm.hint.call");
+@@ -7035,11 +7024,6 @@ virtualmouse:
+ 		}
+ 		break;
+ 	case 'R':
+-		if (r_config_get_b (core->config, "scr.randpal")) {
+-			r_core_cmd_call (core, "ecr");
+-		} else {
+-			r_core_cmd_call (core, "ecn");
+-		}
+ 		__do_panels_refresh (core);
+ 		break;
+ 	case 'a':
+diff --git a/libr/core/visual.c b/libr/core/visual.c
+index 41f4816f59..f81e904c3e 100644
+--- a/libr/core/visual.c
++++ b/libr/core/visual.c
+@@ -336,7 +336,6 @@ static RCoreHelpMessage help_msg_visual = {
+ 	"p/P", "rotate print modes (hex, disasm, debug, words, buf)",
+ 	"q", "back to radare shell",
+ 	"r", "toggle callhints/jmphints/leahints",
+-	"R", "randomize color palette (ecr)",
+ 	"sS", "step / step over",
+ 	"tT", "tt new tab, t[1-9] switch to nth tab, t= name tab, t- close tab",
+ 	"uU", "undo/redo seek",
+@@ -632,8 +631,6 @@ repeat:
+ 			" th     select previous tab (same as tj)\n"
+ 			" tl     select next tab (same as tk)\n"
+ 			" t[1-9] select nth tab\n"
+-			" C   -> rotate scr.color=0,1,2,3\n"
+-			" R   -> rotate color theme with ecr command which honors scr.randpal\n"
+ 		);
+ 		lesstr = r_strbuf_get (p);
+ 		break;
+@@ -3185,12 +3182,6 @@ R_API int r_core_visual_cmd(RCore *core, const char *arg) {
+ 				}
+ 			}
+ 			break;
+-		case 'C':
+-			if (++core->visual.color > 3) {
+-				core->visual.color = 0;
+-			}
+-			r_config_set_i (core->config, "scr.color", core->visual.color);
+-			break;
+ 		case 'd': {
+ 			bool mouse_state = __holdMouseState (core);
+ 			r_core_visual_showcursor (core, true);
+@@ -3401,13 +3392,6 @@ R_API int r_core_visual_cmd(RCore *core, const char *arg) {
+ 			r_core_seek (core, oaddr, true);
+ 			}
+ 			break;
+-		case 'R':
+-			if (r_config_get_i (core->config, "scr.randpal")) {
+-				r_core_cmd_call (core, "ecr");
+-			} else {
+-				r_core_cmd_call (core, "ecn");
+-			}
+-			break;
+ 		case 'e':
+ 			r_core_visual_config (core);
+ 			break;
+diff --git a/libr/core/vmenus.c b/libr/core/vmenus.c
+index 47d094f112..34e8904a9e 100644
+--- a/libr/core/vmenus.c
++++ b/libr/core/vmenus.c
+@@ -813,13 +813,6 @@ R_API bool r_core_visual_bit_editor(RCore *core) {
+ 				}
+ 			}
+ 			break;
+-		case 'R':
+-			if (r_config_get_i (core->config, "scr.randpal")) {
+-				r_core_cmd0 (core, "ecr");
+-			} else {
+-				r_core_cmd0 (core, "ecn");
+-			}
+-			break;
+ 		case '=':
+ 		{ // TODO: edit
+ 			r_core_visual_showcursor (core, true);
+@@ -3896,9 +3889,6 @@ R_API void r_core_visual_anal(RCore *core, const char *input) {
+ 				r_cons_show_cursor (core->cons, false);
+ 			}
+ 			break;
+-		case 'R': // "VvR"
+-			r_core_cmd0 (core, "ecn");
+-			break;
+ 		case 't':
+ 			if (level == 1) {
+ 				r_cons_show_cursor (core->cons, true);

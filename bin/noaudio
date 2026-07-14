@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+remove_audio() {
+  if [ ! -f "$1" ]; then
+    echo "Not a file: '$1'" >&2
+    return 1
+  fi
+
+  path="$1"
+
+  noextpath="${path%\.*}"
+  ext="${path##*\.}"
+  output="$noextpath"_noaudio."$ext"
+
+  ffmpeg -n -i "$path" -vcodec copy -an "$output"
+}
+
+for file in "$@"; do remove_audio "$file"; done

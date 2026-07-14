@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+
+grep=(grep --binary-files=without-match --line-number --with-filename --no-messages)
+
+while getopts ":ard:m:n:cCwF" opt; do
+  case "$opt" in
+    a|r) forward_args+=("-$opt") ;;
+    d|m|n) forward_args+=("-$opt" "$OPTARG") ;;
+    c) grep+=("--ignore-case") ;;
+    C) grep+=("--no-ignore-case") ;;
+    w) grep+=("--word-regexp") ;;
+    F) grep+=("--fixed-strings") ;;
+    *) exit 1 ;;
+  esac
+done
+
+shift $((OPTIND-1))
+
+pattern="$1"
+shift
+
+if [ -z "$1" ]; then
+  set -- .
+fi
+
+fd -0 -t f "${forward_args[@]}" "$@" | xargs -0 "${grep[@]}" -- "$pattern" 2>/dev/null

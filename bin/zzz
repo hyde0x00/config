@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+systemctl suspend -i
+echo "Zzz..."

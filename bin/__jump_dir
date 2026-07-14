@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+result="$(fd -t d "$@" 2>/dev/null | __select_with fzf)"
+status="$?"
+
+if [ "$status" -ne 0 ]; then
+  exit "$status"
+fi
+
+echo "$result"

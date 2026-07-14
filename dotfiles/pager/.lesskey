@@ -1,0 +1,4 @@
+c toggle-option i
+, prev-file
+. next-file
+h noaction

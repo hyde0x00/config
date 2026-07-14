@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+
+if [ $# -ne 2 ]; then
+  echo "Usage: $(basename "$0") <line> [file|-]" >&2
+  exit 1
+fi
+
+lnum="$1"
+file="$2"
+
+if [[ ! $lnum =~ ^-?[0-9]+$ ]]; then
+  echo "Line must be a positive or negative number" >&2
+  exit 1
+fi
+
+if [[ $lnum =~ ^- ]]; then
+  from_end=true
+  lnum=${lnum#-}
+fi
+
+if [ -z "$file" ] || [ "$file" == - ]; then
+  stdin=true
+fi
+
+if [ "$stdin" != true ] && [ ! -f "$file" ]; then
+  echo "Not a file: '$file'" >&2
+  exit 1
+fi
+
+if [ "$stdin" == true ]; then
+  if [ "$from_end" != true ]; then
+    sed -n "${lnum}p"
+  else
+    tac | sed -n "${lnum}p"
+  fi
+else
+  if [ "$from_end" != true ]; then
+    sed -n "${lnum}p" "$file"
+  else
+    tac "$file" | sed -n "${lnum}p"
+  fi
+fi

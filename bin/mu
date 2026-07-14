@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+
+if [ -z "$MUSIC_DIR" ]; then
+  echo "MUSIC_DIR not set"
+  exit 1
+fi
+
+if [ ! -d "$MUSIC_DIR" ]; then
+  echo "Directory not found: '$MUSIC_DIR'"
+  exit 1
+fi
+
+cd "$MUSIC_DIR"
+
+while read -r sel; do
+  selected+=("$sel")
+done < <(fd -t f | sort -V | __select_with fzf -m)
+
+if [ ${#selected[@]} -eq 0 ]; then
+  exit 1
+fi
+
+mpv --osd-level=3 "${selected[@]}"

@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+
+set -e
+
+REPO="https://github.com/radareorg/radare2"
+SRC_DIR="$HOME/src/radare2"
+
+while getopts ":fbp" opt; do
+  case "$opt" in
+    f) set +e ;;
+    b) rebuild_only=true ;;
+    p) update_plugins=true ;;
+    *) exit 1 ;;
+  esac
+done
+
+shift $((OPTIND-1))
+
+if [ "$rebuild_only" == true ]; then
+  msg="Rebuild radare2?"
+else
+  msg="Update and build radare2?"
+fi
+
+if ! confirm "$msg"; then
+  exit 1
+fi
+
+if [ "$rebuild_only" != true ]; then
+  if [ -d "$SRC_DIR" ]; then
+    rm -rf "$SRC_DIR"
+  fi
+  git clone "$REPO" "$SRC_DIR"
+fi
+
+cp "$BACKUP_DIR/radare2/layout" "$HOME/.local/share/radare2/r2panels/layout"
+
+cd "$SRC_DIR" || exit 1
+
+git apply "$BACKUP_DIR/radare2/r2-no-color-keys.patch"
+sh ./sys/install.sh
+
+if [ "$update_plugins" == true ] || confirm "Update plugins?"; then
+  r2pm -ci r2dec
+  r2pm -ci r2ghidra
+fi

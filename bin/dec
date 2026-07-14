@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+print_dec() {
+  printf '%d\n' "$@"
+}
+
+if [ -n "$1" ]; then 
+  print_dec "$@"
+elif [ ! -t 0 ]; then 
+  while read -r hex; do print_dec "$hex"; done
+fi

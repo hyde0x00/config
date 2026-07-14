@@ -1,0 +1,12 @@
+#!/usr/bin/sh
+ 
+case "$1" in
+  post)
+    killall -r 'AmneziaVPN.*'
+    sleep 10
+    touch /tmp/amnezia-vpn
+    chown 1000 /tmp/amnezia-vpn
+  ;;
+esac
+ 
+exit 0

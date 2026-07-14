@@ -1,0 +1,10 @@
+[Unit]
+Description=Monitor for VPN restart trigger
+After=graphical-session.target
+ 
+[Service]
+ExecStart=%h/bin/amnezia-vpn-monitor
+Restart=on-failure
+ 
+[Install]
+WantedBy=graphical-session.target

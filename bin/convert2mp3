@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+# https://stackoverflow.com/questions/3255674/convert-audio-files-to-mp3-using-ffmpeg
+
+to_mp3() {
+  if [ ! -f "$1" ]; then
+    echo "Not a file: '$1'" >&2
+    return 1
+  fi
+
+  ffmpeg -n -i "$1" -ab 320k "${1%\.*}".mp3
+}
+
+for audio in "$@"; do to_mp3 "$audio"; done

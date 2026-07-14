@@ -1,0 +1,47 @@
+#!/usr/bin/perl
+
+use URI::Escape;
+use URI::Find;
+use URI::Title 'title';
+
+use Encode 'decode';
+use open ':std', ':encoding(UTF-8)';
+
+my $finder = URI::Find->new(sub {
+    my ($x, $url) = @_;
+
+    my $title = title($url);
+    if ($title eq '') {
+        return "$url";
+    }
+
+    $url =~ s/www.//;
+
+    # https://stackoverflow.com/questions/58013485/remove-all-graphical-unicode-characters-from-string
+
+    $title =~ s/\p{So}//g;
+    $title =~ s/[’‘]/'/;
+    $title =~ s/[“”]/"/;
+    $title =~ s/ — Википедия//;
+    $title =~ s/ - Wikipedia//;
+    $title =~ s/ - YouTube//;
+    $title =~ s/GitHub - //;
+    $title =~ s/ · GitHub//;
+    $title =~ s/^\s+|\s+$//g;
+
+    # https://perlmonks.org/?node_id=1221250
+    $url = decode 'UTF-8', uri_unescape($url);
+
+    return "[$title]($url)";
+});
+
+if (not -t STDIN) {
+    my $text = do { local $/; <STDIN> };
+    $finder->find(\$text);
+    print "$text";
+}
+if (@ARGV) {
+    my $text = join ' ', @ARGV;
+    $finder->find(\$text);
+    print "$text" . "\n";
+}

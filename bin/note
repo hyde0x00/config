@@ -1,0 +1,113 @@
+#!/usr/bin/env bash
+
+if [ -z "$NOTES_DIR" ]; then
+  echo "NOTES_DIR not set" >&2
+  exit 1
+fi
+
+if [ ! -d "$NOTES_DIR" ]; then
+  mkdir -p "$NOTES_DIR"
+fi
+
+if [ -z "$(find "$NOTES_DIR" -mindepth 1 -maxdepth 1)" ]; then
+  touch "$NOTES_DIR/new-note"
+fi
+
+cleanup() { find "$NOTES_DIR" -empty -delete; }
+
+display_notes_tree() {
+  if [ "$print_result" == true ]; then
+    exit 1
+  fi
+  tree -F -a "$NOTES_DIR"
+  exit 0
+}
+
+edit_directory() {
+  if [ "$print_result" == true ]; then
+    exit 1
+  fi
+  cd "$NOTES_DIR"
+  find . -type f | sed "s|^./||" | vidir -
+  exit 0
+}
+
+open_note() {
+  export FZF_DEFAULT_OPTS+=" --bind=alt-enter:print-query"
+
+  result="$(cd "$NOTES_DIR"; f -p)" 
+  status="$?"
+
+  if [ "$status" -ne 0 ]; then
+    exit "$status"
+  fi
+
+  file="$NOTES_DIR/$result"
+
+  maybe_new_dir="$(dirname "$file")"
+
+  if [ ! -d "$maybe_new_dir" ]; then
+    mkdir -p "$maybe_new_dir"
+  fi
+
+  if [ "$print_result" == true ]; then
+    echo "$file"
+    exit 0
+  fi
+
+  ${EDITOR:-vi} "$file"
+}
+
+search_in_notes() {
+  result="$(cd "$NOTES_DIR"; s -p "$@")" 
+  status="$?"
+
+  if [ "$status" -ne 0 ]; then
+    exit "$status"
+  fi
+
+  while [[ "$result" =~ (.+):([0-9]+): ]]; do
+    file="${BASH_REMATCH[1]}"
+    lnum="${BASH_REMATCH[2]}"
+    if [ -f "$file" ]; then
+      break
+    else
+      result="${BASH_REMATCH[1]}"
+    fi
+  done
+
+  file="$NOTES_DIR/$result"
+
+  if [ "$print_result" == true ]; then
+    printf '%s\n%s\n%d\n' "$result" "$file" "$lnum"
+  else
+    ${EDITOR:-vi} +"$lnum" -- "$file"
+  fi
+}
+
+trap cleanup EXIT
+
+while getopts ":tepcCwF" opt; do
+  case "$opt" in
+    t) display_notes_tree ;;
+    e) edit_directory ;;
+    p) print_result=true ;;
+    c|C|w|F) forward_args+=("-$opt") ;;
+    *) exit 1 ;;
+  esac
+done
+
+shift $((OPTIND-1))
+
+if [ $# -gt 1 ]; then
+  echo "Usage: $(basename "$0") [options] [search_pattern]" >&2
+  exit 1
+fi
+
+pattern="$1"
+
+if [ -n "$pattern" ]; then
+  search_in_notes "${forward_args[@]}" "$pattern"
+else
+  open_note
+fi

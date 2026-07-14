@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+# https://github.com/yt-dlp/yt-dlp/issues/2117
+
+get_playlist_items() {
+  for url in "$@"; do
+    ids="$(yt-dlp --flat-playlist --print id "$url" 2>/dev/null)"
+    for id in $ids; do
+      echo "https://youtube.com/watch?v=$id"
+    done
+  done
+}
+
+if [ -n "$1" ]; then 
+  get_playlist_items "$@"
+elif [ ! -t 0 ]; then 
+  while read -r line; do get_playlist_items "$line"; done
+fi

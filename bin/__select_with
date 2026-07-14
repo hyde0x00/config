@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+if [ -z "$1" ]; then
+  echo "Usage: $(basename "$0") <picker_command>" >&2
+  exit 1
+fi
+
+IFS= read -r line
+if [ -z "$line" ]; then
+  exit 1
+fi
+
+result="$((echo "$line"; cat) | "$@" 2>/dev/null)"
+if [ -z "$result" ]; then
+  exit 2
+fi
+
+echo "$result"

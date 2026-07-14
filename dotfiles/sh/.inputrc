@@ -1,0 +1,8 @@
+set editing-mode vi
+set keymap vi
+set enable-bracketed-paste off
+set bell-style none
+set completion-query-items 0
+set page-completions off
+set show-all-if-ambiguous on
+set match-hidden-files off

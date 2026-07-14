@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+if [ "$(uname)" == "Darwin" ]; then
+  if [ -z "$(which gfind 2>/dev/null)" ]; then
+    echo "GNU find is not installed. Installing..."
+    brew install findutils
+  fi
+  gfind "$@"
+else
+  /usr/bin/find "$@"
+fi

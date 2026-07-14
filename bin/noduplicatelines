@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+
+while getopts ":r" opt; do
+   case "$opt" in
+     r) keep_last=true ;;
+     *) exit 1 ;;
+   esac
+done
+
+shift $((OPTIND-1))
+
+remove_duplicate_lines() {
+  if [ "$keep_last" != true ]; then
+    awk '/^\s*$/ { print; next; }; !seen[$0]++'
+  else
+    tac | awk '/^\s*$/ { print; next; }; !seen[$0]++' | tac
+  fi
+}
+
+if [ -n "$1" ]; then
+  cat "$@" | remove_duplicate_lines
+elif [ ! -t 0 ]; then
+  remove_duplicate_lines
+fi

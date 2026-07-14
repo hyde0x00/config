@@ -1,0 +1,15 @@
+bind x
+bind ^x
+
+bind , prev
+bind . next
+bind w windowlist
+
+startup_message off
+defscrollback 10000
+maptimeout 0
+vbell off
+
+hardstatus alwayslastline "%{= kw}%?%-Lw%?[%{W}%n*%f%t%?[%u]%?]%{w}%?%+Lw%?%? %= %{w} %= %d %M%c"
+# hardstatus alwayslastline "%{= k}%{W}%-w[%n %t]%+w%-=%{W}%c"
+# hardstatus string '%{= Kd}%-w%{BW} %n %t %{Kd}%+w %= %{KW}%l | %d.%m.%y %c:%s%{-}'

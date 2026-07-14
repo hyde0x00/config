@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+img2txt() {
+  in="$1"
+  out="$(timestamp -c)_ocr"
+
+  tesseract "$in" "$out" -l eng+rus
+
+  echo "'$in' -> '$out'"
+}
+
+for i in "$@"; do img2txt "$i"; done

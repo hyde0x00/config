@@ -1,0 +1,100 @@
+#!/usr/bin/env bash
+
+trim_dotslash() {
+  if [ "$null_terminate" == true ]; then
+    sed -z 's|^\./||'
+  else
+    sed 's|^\./||'
+  fi
+}
+
+trim_slashes() {
+  if [[ "$1" =~ / ]]; then
+    echo "$1" | sed 's|//*|/|g; s|/$||; s|^$|/|'
+  else
+    echo "$1"
+  fi
+}
+
+find_with_options() {
+  local -a options=()
+  local -a paths=()
+  local path
+
+  if [ -n "$min_depth" ]; then 
+    options+=(-mindepth "$min_depth")
+  fi
+  if [ -n "$max_depth" ]; then 
+    options+=(-maxdepth "$max_depth")
+  fi
+
+  if [ -n "$name" ]; then 
+    options+=(-name "$name")
+  fi
+  if [ -n "$type" ]; then 
+    options+=(-type "$type")
+  fi
+
+  for path in "$@"; do
+    if [ ! -e "$path" ]; then
+      echo "Not a file or directory: '$path'" >&2
+      continue
+    fi
+
+    if [ "$absolute_path" == true ]; then
+      path="$(realpath -- "$path" 2>/dev/null)"
+    else
+      path="$(trim_slashes "$path")"
+    fi
+
+    paths+=("$path")
+
+    if [ -d "$path" ]; then
+      options+=(-not -path "$path")
+    fi
+
+    if [ "$show_hidden" != true ] && [ -d "$path" ]; then
+      options+=(
+        -not \(
+          -path "$path/.*" -prune
+          -or
+          -path "$path*/.*" -prune
+        \)
+      )
+    fi
+  done
+
+  if [ "${#paths[@]}" -eq 0 ]; then
+    exit 1
+  fi
+
+  if [ "$null_terminate" == true ]; then
+    options+=(\( -type d -printf '%p/\0' -or -print0 \))
+  else
+    options+=(\( -type d -printf '%p/\n' -or -print \))
+  fi
+
+  find -L "${paths[@]}" "${options[@]}" 2>/dev/null | trim_dotslash
+}
+
+while getopts "ard:D:n:t:0" opt; do
+  case "$opt" in
+  a) show_hidden=true ;;
+  r) absolute_path=true ;;
+  d) max_depth="$OPTARG" ;;
+  D) min_depth="$OPTARG" ;;
+  n) name="$OPTARG" ;;
+  t) type="$OPTARG" ;;
+  0) null_terminate=true ;;
+  *) exit 1 ;;
+  :) exit 1 ;;
+  esac
+done
+
+shift $((OPTIND-1))
+
+if [ -z "$1" ]; then
+  set -- .
+fi
+
+find_with_options "$@"

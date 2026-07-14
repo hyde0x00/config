@@ -1,0 +1,60 @@
+#!/usr/bin/env bash
+
+titlecase=true
+
+while getopts "a" opt; do
+  case "$opt" in
+    a) titlecase=false ;;
+  esac
+done
+
+shift $((OPTIND-1))
+
+sub="
+  s/\b\([0-9a-zа-я]\)\([0-9A-Za-zА-Яа-я]*\)\b/\u\1\2/g;
+"
+
+if [ "$titlecase" == true ]; then
+  lowercase_words=(
+    a
+    an
+    and
+    as
+    at
+    but
+    by
+    for
+    from
+    in
+    into
+    nor
+    of
+    off
+    on
+    onto
+    or
+    out
+    over
+    so
+    the
+    to
+    up
+    with
+    yet
+  )
+
+  for word in "${lowercase_words[@]}"; do
+    sub="${sub}; s/\(\<${word}\>\)/\L\1/gi"
+  done
+fi
+
+sub="${sub}; s/\(^[[:space:]]\?\)\(.\)/\1\U\2/g"
+sub="${sub}; s/\([\/\.!?;:()\[\"[—–-][[:space:]]\?\)\(.\)/\1\U\2/g"
+sub="${sub}; s/\(['’]\)\(d\|ll\|m\|re\|s\|t\|ve\)/\1\L\2/gi"
+sub="${sub}; s/\(\.[0-9A-Za-z]*$\)/\L\1/"
+
+sub="${sub}; s/\(mf doom\)/\U\1/gi"
+
+sub="${sub}; s/(\(Feat\|Prod\)\. /(\L\1. /g"
+
+sed "${sub}"

@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+
+separator='``` '
+
+translate() {
+  word="$1"
+  translation="$(
+    sdcv -n "${1,,}" 2>/dev/null \
+      | sed "
+        /^Nothing similar/ { s/.*/NOT_FOUND/; s/^/ / };
+        /^Found/d;
+        /^$/d;
+        /^-->Lingvo/d;
+        /•/d;
+        s/[[:alnum:]]*\.wav//g;
+        s/^-->/ /;
+        s/^[[:space:]]\+/${separator}/;
+        s/\s\+$//g;
+      " \
+    | tr '\n' ' ' | sed 's/\s\+$//g'
+  )"
+  echo "$word $translation"
+}
+
+if [ -n "$1" ]; then
+  for word in "$@"; do 
+    translate "$word"
+  done
+elif [ ! -t 0 ]; then
+  while read -r word; do
+    if [ -n "$word" ]; then
+      translate "$word"
+    else
+      echo
+    fi
+  done
+fi

@@ -1,0 +1,13 @@
+#!/bin/sh
+
+# Simple monitor script that watches for a trigger file
+while true; do
+    if [ -f /tmp/amnezia-vpn ]; then
+        # Remove the trigger file
+        rm /tmp/amnezia-vpn
+        # Restart the app
+	sleep 5
+        /usr/local/bin/AmneziaVPN &
+    fi
+    sleep 1
+done

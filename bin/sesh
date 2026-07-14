@@ -1,0 +1,85 @@
+#!/usr/bin/env bash
+
+histfile="$HOME/.sesh_history"
+
+history_add() {
+  echo "$1" >> "$histfile"
+  tmp="$(mktemp)"
+  cat "$histfile" | noduplicatelines | nowhitespace | noblanklines > "$tmp"
+  mv "$tmp" "$histfile"
+}
+
+history_edit() {
+  ${EDITOR:-vi} "$histfile"
+  exit
+}
+
+history_restore() {
+  while read -r path; do
+    sesh "$path"
+  done < "$histfile"
+  if [ -z "$TMUX" ]; then
+    tmux attach-session
+  fi
+  exit
+}
+
+while getopts ":aerj" opt; do
+  case "$opt" in
+    a) add_to_history=true ;;
+    e) history_edit ;;
+    r) history_restore ;;
+    j) use_jump_dir=true ;;
+    *) exit 1 ;;
+  esac
+done
+
+shift $((OPTIND-1))
+
+if [ "$use_jump_dir" == true ]; then
+  path="$(__jump_dir "$@")"
+  if [ -z "$path" ]; then
+    exit 1
+  fi
+  set -- "$path"
+fi
+
+if [ -z "$1" ]; then
+  set -- "$PWD"
+fi
+
+for path in "$@"; do
+  if [ ! -d "$path" ]; then
+    echo "Not a directory: '$path'" >&2
+    continue
+  fi
+
+  # path="$(realpath -- "$path")"
+  path="$(cd "$path" && echo "$PWD")"
+
+  if [ "$add_to_history" == true ]; then
+    history_add "$path"
+  fi
+
+  if [ "$path" == "$HOME" ]; then
+    name=home
+  else
+    name="$(basename "$path" | tr . _)"
+  fi
+
+  # if tmux has-session -t="$name" 2>/dev/null; then
+  #   # Rename duplicate sessions maybe
+  # fi
+
+  tmux new-session -d -c "$path" -s "$name" 2>/dev/null
+done
+
+if [ -z "$name" ]; then
+  exit 1
+fi 
+
+if [ -z "$TMUX" ]; then
+  tmux attach-session -t "$name" 2>/dev/null
+else
+  tmux switch-client -t "$name" 2>/dev/null
+fi

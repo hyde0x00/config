@@ -1,0 +1,82 @@
+#!/usr/bin/env bash
+
+noextname() {
+  case "$1" in
+    *.tar.bz2|*.tar.gz|*.tar.xz|*.tar.zst) from_field=3 ;;
+    *) from_field=2 ;;
+  esac
+
+  echo "$1" | rev | cut -d '.' -f "$from_field"- | rev
+}
+
+dupname() {
+  name="$1"
+  dupname="$name"
+
+  n=1
+
+  while [ -e "$dupname" ]; do
+    dupname="${name}_${n}"
+    n=$((n+1))
+  done
+
+  echo "$dupname"
+}
+
+extract() {
+  if [ ! -f "$1" ]; then
+    echo "Not a file: '$1'" >&2
+    return 1
+  fi
+
+  archive="$(realpath -- "$1")"
+  src_dir="$(dirname "$archive")"
+  target="$(noextname "$(basename "$archive")")"
+  new_dir="$(dupname "$src_dir/$target")"
+
+  mkdir "$new_dir"
+  cd "$new_dir"
+
+  case "$archive" in
+    *.tar.bz2|*.tar.gz|*.tar.xz) tar xvf "$archive" ;;
+    *.tar.zst) tar -I zstd -xf "$archive" ;;
+    *.gz) gunzip "$archive" ;;
+    *.xz) unxz "$archive" ;;
+    *.zst) zstd -d "$archive"  ;;
+    *.7z|*.apk|*.arj|*.cab|*.cb7|*.chm|*.deb|*.iso|*.lzh|*.msi|*.pkg|*.rpm|*.udf|*.wim|*.xar|*.vhd) 7z x "$archive" ;;
+    *.cba|*.ace) unace x "$archive" ;;
+    *.cbr|*.rar) unrar x -ad "$archive" ;;
+    *.cbt|*.txz|*.tar) tar xvf "$archive" ;;
+    *.cbz|*.epub|*.zip) unzip "$archive" ;;
+    *.cpio) cpio -id < "$archive" ;;
+    *.exe) cabextract "$archive" ;;
+    *.lzma) unlzma "$archive" ;;
+    *.tbz2) tar xvjf "$archive" ;;
+    *.tgz) tar xvzf "$archive" ;;
+    *.zpaq) zpaq x "$archive" ;;
+    *.z|*.Z) uncompress "$archive" ;;
+    *.cso) ciso 0 "$archive" "${archive}.iso" && extract "${archive}.iso" && rm -f "$archive" ;;
+    *.dmg) hdiutil mount "$archive" -mountpoint "$archive" ;;
+    *.zlib) zlib-flate -uncompress < "$archive" > "${archive}.tmp" && mv "${archive}.tmp" "${archive%.*zlib}" && rm -f "$archive" ;;
+    *) echo "Unknown format: '$archive'" >&2; false ;;
+  esac
+
+  if [ $? -ne 0 ]; then
+    cd ..
+    rmdir "$new_dir" &>/dev/null
+    return 1
+  fi
+
+  extracted="$(find . -mindepth 1 -maxdepth 1 -type d)"
+  duplicate="./$target"
+
+  if [ "$extracted" == "$duplicate" ]; then
+    mv -- "$duplicate"/.* "$duplicate"/* . 2>/dev/null
+    rmdir -- "$duplicate" 2>/dev/null
+  fi
+
+  cd ..
+  rmdir "$new_dir" &>/dev/null
+}
+
+for archive; do extract "$archive"; done

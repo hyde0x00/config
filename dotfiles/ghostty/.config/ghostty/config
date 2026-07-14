@@ -1,0 +1,41 @@
+keybind = ctrl+enter=unbind
+keybind = f11=toggle_fullscreen
+
+font-family = Menlo
+font-size = 12
+
+font-style-bold = false
+font-style-italic = false
+font-style-bold-italic = false
+
+mouse-hide-while-typing = true
+
+cursor-style = block
+cursor-style-blink = true
+shell-integration-features = no-cursor
+
+bold-is-bright = true
+
+foreground = ffffff
+background = 000000
+
+palette = 0=#000000
+palette = 1=#cc0000
+palette = 2=#00cc00
+palette = 3=#cc7700
+palette = 4=#0000ff
+palette = 5=#cc00cc
+palette = 6=#00cccc
+palette = 7=#cccccc
+palette = 8=#777777
+palette = 9=#ff7777
+palette = 10=#77ff77
+palette = 11=#ffff77
+palette = 12=#7777ff
+palette = 13=#ff77ff
+palette = 14=#77ffff
+palette = 15=#ffffff
+
+window-width = 80
+window-height = 26
+

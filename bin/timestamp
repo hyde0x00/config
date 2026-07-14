@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+
+format=short
+
+while getopts ":ciuz" opt; do
+  case "$opt" in
+    c) format=compact ;;
+    i) format=short-iso ;;
+    u|z) utc=true ;;
+    *) exit 1 ;;
+  esac
+done
+
+shift $((OPTIND-1))
+
+case "$format" in
+  compact) fmt='+%Y%m%d%H%M%S' ;;
+  short) fmt='+%b %d %H:%M:%S' ;;
+  short-iso) fmt='+%Y-%m-%d %H:%M:%S' ;;
+esac
+
+if [ "$utc" == true ]; then
+  date -u "${fmt}Z"
+else
+  date "$fmt"
+fi

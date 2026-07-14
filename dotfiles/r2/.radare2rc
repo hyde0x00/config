@@ -1,0 +1,84 @@
+e asm.cmt.right=true
+e asm.cmt.col=100
+
+e hex.header=false
+e hex.offset=false
+
+e stack.size=512
+
+# e scr.utf8 = true
+
+# e io.cache=false
+# e dbg.bpinmas=0 
+
+e scr.layout=layout 
+
+e scr.color=1
+
+ecd
+ec comment bblack
+ec usrcmt bmagenta
+ec creg bred
+ec fline bblack
+ec flow2 bblack
+ec flow bblack
+ec graph.box2 yellow
+ec graph.box bblack
+ec graph.current bblack
+ec graph.false bred
+ec graph.true bgreen
+ec graph.trufae byellow
+ec gui.border bblack
+ec offset bblack
+ec ai.ascii bwhite
+ec ai.exec bwhite
+ec ai.read bwhite
+ec ai.seq bwhite
+ec ai.write bwhite
+ec args bwhite
+ec b0x00 bwhite
+ec b0x7f bwhite
+ec b0xff bwhite
+ec bin bwhite
+ec btext bwhite
+ec call bwhite
+ec cjmp bwhite
+ec cmp bwhite
+ec crypto bwhite
+ec flag bwhite
+ec floc bwhite
+ec fname bwhite
+ec graph.box3 bwhite
+ec graph.box4 bwhite
+ec graph.traced bwhite
+ec gui.background2 bwhite
+ec gui.background bwhite
+ec gui.cflow bwhite
+ec gui.dataoffset bwhite
+ec help bwhite
+ec input bwhite
+ec invalid bwhite
+ec jmp bwhite
+ec label bwhite
+ec linehl bwhite
+ec math bwhite
+ec mov bwhite
+ec nop bwhite
+ec num bwhite
+ec other bwhite
+ec pop bwhite
+ec prompt bwhite
+ec push bwhite
+ec reg bwhite
+ec ret bwhite
+ec swi bwhite
+ec trap bwhite
+ec ucall bwhite
+ec ujmp bwhite
+ec var.addr bwhite
+ec var bwhite
+ec var.name bwhite
+ec var.type bwhite
+ec widget.bg bwhite
+ec widget.sel bwhite
+ec wordhl bwhite

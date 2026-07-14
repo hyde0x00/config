@@ -1,0 +1,20 @@
+Only in diff: cmd-parse.c
+Common subdirectories: diff/compat and tmux-3.4/compat
+Only in tmux-3.4/: config.log
+Only in tmux-3.4/: config.status
+Only in tmux-3.4/: .deps
+Common subdirectories: diff/etc and tmux-3.4/etc
+Common subdirectories: diff/fuzz and tmux-3.4/fuzz
+Only in tmux-3.4/: Makefile
+diff diff/window-copy.c tmux-3.4/window-copy.c
+4236,4243c4236
+< 		if (gl->time == 0)
+< 			xsnprintf(tmp, sizeof tmp, "[%u/%u]", data->oy, hsize);
+< 		else {
+< 			t = format_pretty_time(gl->time, 1);
+< 			xsnprintf(tmp, sizeof tmp, "%s [%u/%u]", t, data->oy,
+< 			    hsize);
+< 			free(t);
+< 		}
+---
+> 		xsnprintf(tmp, sizeof tmp, "[%u/%u]", data->oy, hsize);

@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+# https://stackoverflow.com/questions/5929492/bash-script-to-convert-from-html-entities-to-characters
+
+perl -MHTML::Entities -pe 'decode_entities($_);'

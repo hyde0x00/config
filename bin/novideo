@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+
+# https://stackoverflow.com/questions/9913032/how-can-i-extract-audio-from-video-with-ffmpeg
+
+remove_video() {
+  if [ ! -f "$1" ]; then
+    echo "Not a file: '$1'" >&2
+    return 1
+  fi
+
+  path="$1"
+
+  noextpath="${path%\.*}"
+  ext="${path##*\.}"
+  output="$noextpath"_novideo."$ext"
+
+  ffmpeg -n -i "$path" -vn -c:a copy "$output"
+}
+
+for file in "$@"; do remove_video "$file"; done

@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+if [ "$(uname)" == "Darwin" ]; then
+  if [ -z "$(which gsed 2>/dev/null)" ]; then
+    echo "GNU sed is not installed. Installing..."
+    brew install gnu-sed
+  fi
+  gsed "$@"
+else
+  /usr/bin/sed "$@"
+fi

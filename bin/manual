@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+if [ -z "$1" ]; then
+  set -- .
+fi
+
+result="$(man -k "$@" | __select_with fzf)"
+
+if [ -z "$result" ]; then
+  exit 1
+fi
+
+[[ "$result" =~ ^([^[:space:]]+)[[:space:]]*\(.+\) ]]
+
+section="${BASH_REMATCH[1]}"
+page="${BASH_REMATCH[2]}"
+
+man "$section" "$page" 2>/dev/null

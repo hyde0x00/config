@@ -1,0 +1,26 @@
+#!/bin/bash
+
+if [ "$#" -ne 2 ]; then
+  echo "Usage: $(basename "$0") [album.cue] [album.flac]"
+  exit 1
+fi
+
+cue_file="$1"
+flac_file="$2"
+
+shnsplit -f "$cue_file" -t "%n. %t" -o flac "$flac_file"
+
+exit 
+
+# cuetag "$cue_file" 
+
+
+# command -v cuebreakpoints >/dev/null 2>&1 || { echo "cuetools is required but not installed!" >&2; exit 1; }
+# command -v shnsplit >/dev/null 2>&1 || { echo "shntool is required but not installed!" >&2; exit 1; }
+# command -v lame >/dev/null 2>&1 || { echo "lame is required but not installed!" >&2; exit 1; }
+# 
+# echo "Splitting and converting..."
+# 
+# cuebreakpoints "$cue_file" | shnsplit "$flac_file"
+# 
+# echo "Done."

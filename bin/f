@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+
+action=default
+
+while getopts ":ard:m:n:eop" opt; do
+  case "$opt" in
+    a|r) forward_args+=("-$opt") ;;
+    d|m|n) forward_args+=("-$opt" "$OPTARG") ;;
+    e) action=edit ;;
+    o) action=open ;;
+    p) action=print ;;
+    *) exit 1 ;;
+  esac
+done
+
+shift $((OPTIND-1))
+
+result="$(fd -t f "${forward_args[@]}" "$@" | __select_with fzf)"
+status="$?"
+
+if [ "$status" -ne 0 ]; then
+  exit "$status"
+fi
+
+if [ "$action" == default ]; then
+  type="$(file --brief --dereference -- "$result" 2>/dev/null)"
+  case "$type" in
+    *JSON*|*text*|empty) action=edit ;;
+    *) action=open ;;
+  esac
+fi
+
+case "$action" in
+  open) open "$result" ;;
+  edit) ${EDITOR:-vi} -- "$result" ;;
+  print) echo "$result" ;;
+esac

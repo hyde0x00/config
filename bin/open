@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+if [ "$(uname)" == Darwin ]; then
+  /usr/bin/open "$@"
+else
+  if [ $# -eq 0 ]; then
+    echo "Usage: $(basename "$0") <files|URLs>"
+    exit 1
+  fi
+  for path in "$@"; do
+    case "$path" in
+      http://*|https://*) 
+        xdg-open "$path" 
+        ;;
+      *)
+        path="$(realpath -- "$path" 2>/dev/null)"
+        if [ ! -e "$path" ]; then
+          echo "Not a file or URL: $path" >&2
+          continue
+        fi 
+        xdg-open "$path"
+        ;;
+    esac
+  done
+fi

@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+if [ "$(uname)" == "Darwin" ]; then
+  if [ -z "$(which ggrep 2>/dev/null)" ]; then
+    echo "GNU grep is not installed. Installing..."
+    brew install grep
+  fi
+  ggrep "$@"
+else
+  /usr/bin/grep "$@"
+fi
